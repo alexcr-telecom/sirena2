@@ -31,8 +31,8 @@
 <hr>
  <?php
  //Mysql
- $mysql = mysql_connect("localhost", "root", "vicidialnow") or die(mysql_error());
- mysql_select_db("asterisk") or die(mysql_error());
+ $mysql = mysql_connect("localhost", "root") or die(mysql_error());
+ mysql_select_db("sirena2") or die(mysql_error());
  
  //Обработка формы
  if ($_SERVER["REQUEST_METHOD"] == "POST" ) {
@@ -43,16 +43,15 @@ $uploadOk = 1;
 //Удаление списка
 	if(isset($_POST['delete_list'])) {
 		foreach ($_POST['delete_list'] as $list_del){
-		mysql_query("DELETE FROM vicidial_lists WHERE list_id = '".$list_del."'") or die(mysql_error());
-		mysql_query("DELETE FROM vicidial_list WHERE list_id = '".$list_del."'") or die(mysql_error());
+		mysql_query("DELETE FROM dialout_lists WHERE list_id = '".$list_del."'") or die(mysql_error());
+		mysql_query("DELETE FROM dialout_list WHERE list_id = '".$list_del."'") or die(mysql_error());
 		}
 	} 
 
 //Добавление списка
 	if($_POST['list_name'] != "" ) {
 		$list_id = rand(1050, 10000);
-		mysql_query('insert into dialout_lists values("'.$list_id.'","'.$_POST['list_name'].'","'.date('Y-m-d h:i:s').'")') 
-	or die(mysql_error()); 
+		mysql_query('insert into dialout_lists values("'.$list_id.'","'.$_POST['list_name'].'")') or die(mysql_error()); 
 	}
 	
 // Проверка размера файла
@@ -75,7 +74,7 @@ if (isset($_FILES["leadfile"]) && $_FILES["leadfile"]["type"] != "application/vn
 		//Конвертация файла
 		$new_filename = preg_replace("/\.csv$|\.xls$|\.xlsx$|\.ods$|\.sxc$/i", '.txt', $_FILES["leadfile"]["name"]);
 		exec ('cp '.$_FILES["leadfile"]["tmp_name"].' /tmp/'.$_FILES["leadfile"]["name"]);
-		exec('/var/www/html/vicidial/sheet2tab.pl /tmp/'.$_FILES["leadfile"]["name"].' /tmp/'.$new_filename);
+		exec('/var/www/html/sheet2tab.pl /tmp/'.$_FILES["leadfile"]["name"].' /tmp/'.$new_filename);
 		
 		//Счетчики
 		$dups_number=0;
@@ -90,7 +89,7 @@ if (isset($_FILES["leadfile"]) && $_FILES["leadfile"]["type"] != "application/vn
 					$phone_number = preg_replace('/\,/', '', $leads[0]);
 					$alt_number = preg_replace('/\,/', '', $leads[2]);
 					//Проверка дубката номера
-					$sql = mysql_query("SELECT phone_number FROM vicidial_list WHERE phone_number='".$phone_number."' and list_id='".$_POST['listtoadd']."'");
+					$sql = mysql_query("SELECT phone_number FROM dialout_list WHERE phone_number='".$phone_number."' and list_id='".$_POST['listtoadd']."'");
 					$dups = mysql_num_rows($sql);
 					if ($dups) {
 						$dups_number++;
@@ -109,7 +108,7 @@ if (isset($_FILES["leadfile"]) && $_FILES["leadfile"]["type"] != "application/vn
 					//Коммит строки в базу
 					if ($notdup && $isnumber){
 						//print $_POST['listtoadd']."  ". $phone_number ."  ". $alt_number ."  ". $leads[1] . $leads[3]. "<br>";
-						mysql_query('insert into dialout_list values("'.$_POST['listtoadd'].'","'.$phone_number.'","'.$leads[1].'","'.$alt_number.'","'.$leads[3].',"",","ADD","")') or die(mysql_error());
+						mysql_query('insert into dialout_list values("'.$_POST['listtoadd'].'","'.$phone_number.'","'.$leads[1].'","'.$alt_number.'","'.$leads[3].'","","ADD")') or die(mysql_error());
 					}
 			}
 			unlink("/tmp/".$new_filename);
@@ -129,9 +128,9 @@ if (isset($_FILES["leadfile"]) && $_FILES["leadfile"]["type"] != "application/vn
 <?php
 //Вывод перечня списков
 $number = 1 ;
-$list = mysql_query("select list_id,list_name from vicidial_lists where list_id != '1001'") or die(mysql_error());
+$list = mysql_query("select list_id,list_name from dialout_lists where list_id != '1001'") or die(mysql_error());
   while($list_data = mysql_fetch_array( $list )){
-	$data = mysql_query("select COUNT(*) from vicidial_list where list_id = '".$list_data['list_id']."'") or die(mysql_error());
+	$data = mysql_query("select COUNT(*) from dialout_list where list_id = '".$list_data['list_id']."'") or die(mysql_error());
 	$count = mysql_fetch_array( $data );
 	Print "<tr>";
 	print("<td>".$number."</td> ");
@@ -167,7 +166,7 @@ $list = mysql_query("select list_id,list_name from vicidial_lists where list_id 
 	<option value="">Выбор...</option>
 	<?php
 	
-	$list = mysql_query("select list_id,list_name from vicidial_lists") or die(mysql_error());
+	$list = mysql_query("select list_id,list_name from dialout_lists") or die(mysql_error());
 	while($list_data = mysql_fetch_array( $list )){
 	Print "<option value=".$list_data['list_id'].">".$list_data['list_name']."</option>";
 }

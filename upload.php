@@ -32,14 +32,14 @@
 
 <hr>
 <?php 
-$mysql = mysql_connect("localhost", "root", "vicidialnow") or die(mysql_error());
-mysql_select_db("asterisk") or die(mysql_error());
+ $mysql = mysql_connect("localhost", "root") or die(mysql_error());
+ mysql_select_db("sirena2") or die(mysql_error());
 
  if ($_SERVER["REQUEST_METHOD"] == "POST" ) {
  // Инициализация переменных
  $target_dir = "/var/www/html/sounds/";
  $target_name = preg_split("/\./", $_FILES["fileToUpload"]["name"], -1, PREG_SPLIT_NO_EMPTY);
- $target_file = $target_dir ."go_".$target_name[0].".wav";
+ $target_file = $target_dir.$target_name[0].".wav";
  $uploadOk = 1;
 
 
@@ -102,7 +102,7 @@ Print "<th>№</th><th>Файл</th><th>Тема сообщения</th><th>Те
 	 
 	  Print "<tr>";
 	   Print "<td>".$number."</td> ";
-	   Print "<td><a href=/sounds/go_".$alarm['alarm_code'].".wav>".$alarm['alarm_code']."</a> </td> ";
+	   Print "<td><a href=/sounds/".$alarm['alarm_code'].".wav>".$alarm['alarm_code']."</a> </td> ";
 	    Print "<td>".$alarm['header']."</td> ";
 	    Print "<td>".$alarm['message']."</td> ";
 	    

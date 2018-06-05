@@ -47,10 +47,10 @@
   <option value="">Выбор...</option>	
 	
 <?php 
-$mysql = mysql_connect("localhost", "root", "vicidialnow") or die(mysql_error());
-mysql_select_db("asterisk") or die(mysql_error());
+ $mysql = mysql_connect("localhost", "root") or die(mysql_error());
+ mysql_select_db("sirena2") or die(mysql_error());
   //Список абонентов
- $list = mysql_query("select list_id,list_name from vicidial_lists") or die(mysql_error());
+ $list = mysql_query("select list_id,list_name from dialout_lists") or die(mysql_error());
   while($list_data = mysql_fetch_array( $list )) 
  { 
   if (isset($_POST['list_code']) &&
@@ -68,17 +68,17 @@ $fp = fopen("php://temp/maxmemory:$size_fp", 'r+');
 
  //Обработка и запись данных в память
  function print_table($fp){
- $sql_data = mysql_query("select phone_number,first_name,last_local_call_time,status from vicidial_list where list_id = '". $_POST['list_code']."' ") or die(mysql_error());
+ $sql_data = mysql_query("select phone_number,first_name,last_local_call_time,status from dialout_list where list_id = '". $_POST['list_code']."' ") or die(mysql_error());
  $count=0; 
  $total=0;
  while($raw = mysql_fetch_array( $sql_data )){
 	 $total++;
- if($raw['status'] == PM || $raw['status'] == PU){
+ if($raw['status'] == "Answered as  HUMAN The message heared" || $raw['status'] == "Answered as  HUMAN The message unheared"){
 	 $count++;
  }
 }
 
-	$sql_data = mysql_query("select phone_number,first_name,last_local_call_time,status from vicidial_list where list_id = '". $_POST['list_code']."' ") or die(mysql_error());
+	$sql_data = mysql_query("select phone_number,first_name,last_local_call_time,status from dialout_list where list_id = '". $_POST['list_code']."' ") or die(mysql_error());
  fwrite($fp,'<div id="warning">Абонентов обработано: '.$count.' |  Абонентов всего: '.$total.'</div>');
  fwrite($fp,"<table border cellpadding=3 style=width:100% algin=center>");
  fwrite($fp,"<th>№</th><th>Номер телефона:</th><th>ФИО:</th><th>Время:</th> <th>Статус:</th> "); 
@@ -86,16 +86,16 @@ $fp = fopen("php://temp/maxmemory:$size_fp", 'r+');
  while($info = mysql_fetch_array( $sql_data )) 
  { 
 	 switch ($info['status'] ) {
-		 case "PM":
+		 case "Answered as  HUMAN The message heared":
 			$status = "Сообщение прослушано";
 			break;
-		 case "PU":
+		 case "Answered as  HUMAN The message unheared":
 			$status = "Сообщение недослушано";
 			break;	
-		 case "NA":
+		 case "Ring timeout":
 			$status = "Нет ответа";
 			break;	
-		 case "B":
+		 case "Busy":
 			$status = "Абонент занят";
 			break;
 		 case "SP":
@@ -104,7 +104,7 @@ $fp = fopen("php://temp/maxmemory:$size_fp", 'r+');
          case "ADD":
             $status = "Не обработан";
             break;
-         case "AA":
+         case "Answered as  MACHINE The message heared":
             $status = "Автоответчик";
             break;
          case "NEW":
@@ -135,34 +135,7 @@ if($_POST['list_code'] != '' ){
 	print '</div><div>
   <input type="button" value="Печать таблицы" onclick="PrintDiv();" />
 	</div>';
-	print '<hr><input type="submit" name="send_mail" value="Отправить отчет ПДС">';
-}
-//Отправка отчета ПДС 
-if($_POST['list_code'] != '' && isset($_POST['send_mail'])){
-	//Определение потока с данными
-	$size_fp = 1 * 1024 * 1024;
-	$fp = fopen("php://temp/maxmemory:$size_fp", 'r+');
-	//Заголовки письма
-	$subject = '=?utf-8?b?'.base64_encode("Протокол вызовов системы автоматического оповещения от ".date("d-m-Y")).'?=';
-        $headers = 'From: sirena@utg.gazprom.ru' . "\r\n" .
-        'Content-Type: text/html; charset=UTF-8' .
-        'X-Mailer: PHP/' . phpversion();
-	$to = 'pds@utg.gazprom.ru';
-	print_table($fp);
-	$body = '
-	<html>
-    <head><meta http-equiv="content-type" content="text/html; charset=utf-8" /></head><body>
-	'.stream_get_contents($fp).'</body>
-	</html>        
-	';
-//Отправка письма
-if (mail($to, $subject, $body, $headers)) {
-
-	echo("<h1>Сообщение отправлено</h1>");
-	} else {
-	echo("<h1>Ошибка отправления</h1>");
-	}
-	fclose($fp);
+	
 }
  print "</form>";
  mysql_close($mysql);
@@ -200,7 +173,7 @@ if (mail($to, $subject, $body, $headers)) {
 		</div>
 	</div>
 	<br />&nbsp;<br />
-	<div id="footer">Copyright &copy; 2016 US | Design: СЦС 
+	<div id="footer">Copyright &copy; 2018 US | Design: СЦС 
 		 
 </div>
 	

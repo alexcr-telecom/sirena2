@@ -34,8 +34,8 @@
 		
 <hr>
 <?php 
-$mysql = mysql_connect("localhost", "root", "vicidialnow") or die(mysql_error());
-mysql_select_db("asterisk") or die(mysql_error());
+$mysql = mysql_connect("localhost", "root") or die(mysql_error());
+mysql_select_db("sirena2") or die(mysql_error());
  
  
 $sql_data = mysql_query("select * from alarm_journal") or die(mysql_error());
@@ -94,7 +94,7 @@ mysql_close($mysql);
 		</div>
 	</div>
 	<br />&nbsp;<br />
-	<div id="footer">Copyright &copy; 2015 US | Design: СЦС 
+	<div id="footer">Copyright &copy; 2018 US | Design: СЦС 
 		 
 </div>
 	

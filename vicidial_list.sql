@@ -1,6 +1,6 @@
 -- MySQL dump 10.11
 --
--- Host: localhost    Database: asterisk
+-- Host: localhost    Database: sirena2
 -- ------------------------------------------------------
 -- Server version	5.0.95
 
@@ -26,10 +26,27 @@ CREATE TABLE `dialout_list` (
   `list_id` bigint(14) unsigned NOT NULL default '0',
   `phone_number` varchar(18) NOT NULL,
   `first_name` varchar(30) default NULL,
-  `last_name` varchar(30) default NULL,
   `alt_phone` varchar(12) default NULL,
   `email` varchar(70) default NULL,
   `last_local_call_time` datetime default NULL,
-  `status` varchar(6) default NULL,
+  `status` text collate utf8_unicode_ci
 ) ENGINE=InnoDB AUTO_INCREMENT=945 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+DROP TABLE IF EXISTS `dialout_lists`;
+
+CREATE TABLE `dialout_lists` (
+  `list_id` bigint(14) unsigned NOT NULL default '0',
+  `list_name` varchar(30) default NULL
+) ENGINE=InnoDB AUTO_INCREMENT=945 DEFAULT CHARSET=latin1;
+
+CREATE TABLE `alarm_journal` (
+  `data` varchar(30) collate utf8_unicode_ci default NULL,
+  `IP` varchar(16) collate utf8_unicode_ci default NULL,
+  `dial` varchar(3) collate utf8_unicode_ci default NULL,
+  `mail` varchar(3) collate utf8_unicode_ci default NULL,
+  `sms` varchar(3) collate utf8_unicode_ci default NULL,
+  `alarm_code` text collate utf8_unicode_ci,
+  `list_code` text collate utf8_unicode_ci,
+  `username` text collate utf8_unicode_ci
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;

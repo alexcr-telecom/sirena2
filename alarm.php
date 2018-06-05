@@ -31,13 +31,13 @@
  <?php
 
  //Mysql
- $mysql = mysql_connect("localhost", "root", "vicidialnow") or die(mysql_error());
- mysql_select_db("asterisk") or die(mysql_error());
+ $mysql = mysql_connect("localhost", "root") or die(mysql_error());
+ mysql_select_db("sirena2") or die(mysql_error());
   //Проверка занятости системы
-	$sql_data2 = mysql_query("select status from vicidial_list where status = 'NEW'") 	or die(mysql_error());
+	$sql_data2 = mysql_query("select status from dialout_list where status = 'NEW'") 	or die(mysql_error());
 	$status = mysql_fetch_array( $sql_data2 );	
-	$gammu = exec("ps -A | grep  gammu");
-	$redial = exec("ls /tmp/redial_inwork");
+
+	
 
 //Обработка формы
  if ($_SERVER["REQUEST_METHOD"] == "POST" ) {
@@ -48,37 +48,61 @@ if(isset($_POST['alarm_code']) && $_POST['dial'] == 'ON' && isset($_POST['list_c
 }
 //Остановка системы
 if (isset ($_POST['stop'])) {
-	mysql_query("update vicidial_list set status = 'SP' where status ='NEW'") or die(mysql_error());
+	mysql_query("update dialout_list set status = 'SP' where status ='NEW'") or die(mysql_error());
 	exec('killall -9 bash');
-	exec('killall -9 gammu');
-	exec('rm -f /tmp/redial_inwork');
+	
 	print '<div id="warning">АВАРИЙНАЯ ОСТАНОВКА</div>';
 }
-
-//Обзвон абонентов	 
-	if($_POST['dial'] == 'ON'  && empty($_POST['stop']) && $_POST['alarm_code'] != '' && empty($status)) {
-	   
-	mysql_query("update vicidial_list set status = 'NEW',called_since_last_reset = 'N',gmt_offset_now = '-5.00' where list_id ='". $_POST['list_code']."'") or die(mysql_error());
-	//Перезвонить недоступных
-	exec("bash /usr/bin/redial.sh ".$_POST['list_code']." >/dev/null 2>/dev/null &");
-	}else { 
-	$unchoose_count++;
-		}
 //Выбор кода оповещения		
 	if($_POST['alarm_code'] != '' && $unchoose_count < '3' && empty($_POST['stop']) && empty($status)) {	     
 	 
-        mysql_query("update vicidial_campaigns set survey_first_audio_file = 'go_".$_POST['alarm_code']."' where campaign_id = '92355983'") or die(mysql_error());
+        
       $sql_data = mysql_query("select * from alarm_codes where alarm_code = '".$_POST['alarm_code']."'") or die(mysql_error());
       $data = mysql_fetch_array( $sql_data );
       $header = $data['header'];
       $message = $data['message'];
    }
    
+//Обзвон абонентов
+$CALLERID = 33800;		// CallerID
+$MAXRETRIES = 2;	// Количество повторных попыток
+$RETRYTIME = 120;	// Пауза перед повторной попыткой
+$WAITTIME = 40;		// Время ожидания ответа
+$MESSAGE =  $_POST['alarm_code'];		// Файл для воспроизведения	
+
+$TEMPDIR = '/tmp/';
+$MESSAGE=$_POST['alarm_code'];
+	if($_POST['dial'] == 'ON'  && empty($_POST['stop']) && $_POST['alarm_code'] != '' && empty($status)) {
+	mysql_query("update dialout_list set status = 'NEW' where list_id ='". $_POST['list_code']."'") or die(mysql_error());
+	$sql_data = mysql_query("select * from dialout_list where list_id ='". $_POST['list_code']."'") or die(mysql_error());	
+	 while($data = mysql_fetch_array( $sql_data ))
+{
+	$num=$data['phone_number'];
+	if($num != "")
+	{
+		
+		$HTMPFILE = fopen($TEMPDIR.'file'.$num.'.call',w);
+		fwrite($HTMPFILE, "Channel: Local/$num@sirena-out/n\n");
+		fwrite($HTMPFILE, "CallerID: $CALLERID\n");
+		fwrite($HTMPFILE, "MaxRetries: $MAXRETRIES\n");
+		fwrite($HTMPFILE, "RetryTme: $RETRYTIME\n");
+		fwrite($HTMPFILE, "WaitTme: $WAITTIME\n");
+		fwrite($HTMPFILE, "Context: callback-rings\n");
+		fwrite($HTMPFILE, "Extension: autocall\n");
+		fwrite($HTMPFILE, "Priority: 1\n");
+		fwrite($HTMPFILE, "Set: ARRAY(data,ext)=/var/www/html/sounds/$MESSAGE,$num\n");
+	}
+}
+	exec('/usr/bin/start-dial.sh >/dev/null 2>/dev/null &');
+	}else { 
+	$unchoose_count++;
+		}
+
 
 
 //Рассылка sms
  	if($_POST['sms'] == 'ON' && $_POST['list_code'] != '' && $_POST['alarm_code'] != '' && empty($_POST['stop']) && empty($status)){
-	$sql_data = mysql_query("select phone_number,alt_phone from vicidial_list where list_id ='". $_POST['list_code']."'") or die(mysql_error()) ;
+	$sql_data = mysql_query("select phone_number,alt_phone from dialout_list where list_id ='". $_POST['list_code']."'") or die(mysql_error()) ;
 	    $locale='ru_RU.UTF-8';
         setlocale(LC_ALL,$locale);
         putenv('LC_ALL='.$locale);
@@ -101,7 +125,7 @@ if (isset ($_POST['stop'])) {
                 }
 				
 		}
-		exec('bash /usr/bin/sendsms.sh '.$curr_date.' >/dev/null 2>/dev/null &'); 
+		exec('bash /usr/bin/sendsms-remote.sh '.$curr_date.' 10.16.101.110 >/dev/null 2>/dev/null &');  
 	}else { 
 	$unchoose_count++;
 		}		
@@ -122,10 +146,10 @@ if($unchoose_count < '3' && isset($_POST['alarm_code']) && isset($_POST['list_co
 	mysql_query('insert into alarm_journal values("'.exec("date -Im").'","'.$_SERVER['REMOTE_ADDR'].'","'.$_POST['dial'].'","'.$_POST['mail'].'","'.$_POST['sms'].'","'.$_POST['alarm_code'].'","'.$_POST['list_code'].'","'.$_SERVER['REMOTE_USER'].'")') or 
 die(mysql_error());
 //Перенаправление на страницу запуска
-print '<script>window.location = "/sirena";</script>';
+print '<script>window.location = "/sirena/alarm.php";</script>';
 }
 }		
-	if(empty($status) && empty($gammu) && empty($redial)) {
+	if(empty($status)) {
 	Print '<h2>Статус оповещения: Отключено</h2>';
 	} else {
 		Print '<br><h2>Статус оповещения: <div id="warning">Работа</div></h2>';
@@ -142,7 +166,7 @@ print '<script>window.location = "/sirena";</script>';
 <TD BGCOLOR="#7FFFF4"><h2>Телефонная линия:</h2></TD>
 
 <?php
-if(exec('sudo /usr/sbin/asterisk -x "sip show registry" | grep Registered')){
+if(exec(' /usr/sbin/asterisk -x "iax2 show peers" | grep OK')){
 print "<TD BGCOLOR=#00FF07><h2>OK</h2></TD>";
 } else {
 print "<TD BGCOLOR=#FA0008><h2>Нет связи с АТС</h2></TD>";
@@ -154,7 +178,7 @@ print "<TD BGCOLOR=#FA0008><h2>Нет связи с АТС</h2></TD>";
 <TD BGCOLOR="#7FFFF4"><h2>Модем СМС:</h2></TD>
 
 <?php
-if(exec('ls /dev/ttyUSB0')){
+if(exec('ssh -o ConnectTimeout=5 -o StrictHostKeyChecking=no -i /var/opt/id_rsa sms@10.16.101.110 ls /dev/ttyUSB0')){
 print "<TD BGCOLOR=#00FF07><h2>OK</h2></TD>";	
 } else {
 print "<TD BGCOLOR=#FA0008><h2>Модем не подключен</h2></TD>";
@@ -185,7 +209,7 @@ print "<TD BGCOLOR=#FA0008><h2>Модем не подключен</h2></TD>";
   <option value="">Выбор...</option>
  <?php 
  //Список абонентов
- $data = mysql_query("select list_id,list_name from vicidial_lists where list_id != '1001'") or die(mysql_error());
+ $data = mysql_query("select list_id,list_name from dialout_lists where list_id != '1001'") or die(mysql_error());
   while($list_data = mysql_fetch_array( $data )) 
  { 
   Print "<option value=".$list_data['list_id'].">".$list_data['list_name']."</option>";
@@ -219,10 +243,6 @@ print "<TD BGCOLOR=#FA0008><h2>Модем не подключен</h2></TD>";
 <TR>
 <TD BGCOLOR="#7FFFF4"><h2>Обзвон абонентов:</h2></TD>
 <TD BGCOLOR="#FFFF00"> <input type="checkbox" name="dial" value="ON" /></TD>
-</TR>
-<TR>
-<TD BGCOLOR="#7FFFF4"><h2>Рассылка писем:</h2></TD>
-<TD BGCOLOR="#FFFF00"> <input type="checkbox" name="mail" value="ON" /></TD>
 </TR>
 <TR>
 <TD BGCOLOR="#7FFFF4"><h2>Рассылка СМС:</h2></TD>
