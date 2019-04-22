@@ -40,13 +40,4 @@ CREATE TABLE `dialout_lists` (
   `list_name` varchar(30) default NULL
 ) ENGINE=InnoDB AUTO_INCREMENT=945 DEFAULT CHARSET=latin1;
 
-CREATE TABLE `alarm_journal` (
-  `data` varchar(30) collate utf8_unicode_ci default NULL,
-  `IP` varchar(16) collate utf8_unicode_ci default NULL,
-  `dial` varchar(3) collate utf8_unicode_ci default NULL,
-  `mail` varchar(3) collate utf8_unicode_ci default NULL,
-  `sms` varchar(3) collate utf8_unicode_ci default NULL,
-  `alarm_code` text collate utf8_unicode_ci,
-  `list_code` text collate utf8_unicode_ci,
-  `username` text collate utf8_unicode_ci
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+

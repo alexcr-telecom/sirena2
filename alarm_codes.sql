@@ -30,16 +30,7 @@ CREATE TABLE `alarm_codes` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Dumping data for table `alarm_codes`
---
 
-LOCK TABLES `alarm_codes` WRITE;
-/*!40000 ALTER TABLE `alarm_codes` DISABLE KEYS */;
-INSERT INTO `alarm_codes` VALUES ('â„–1','ÐžÐ±ÑŠÑÐ²Ð»ÐµÐ½ ÑÐ±Ð¾Ñ€.','ÐžÐ±ÑŠÑÐ²Ð»ÐµÐ½ ÑÐ±Ð¾Ñ€.','FALSE'),('â„–2','Ð¡Ð±Ð¾Ñ€ ÐžÐ“Ð','ÐžÐ±ÑŠÑÐ²Ð»ÐµÐ½ ÑÐ±Ð¾Ñ€ Ð¾Ð¿ÐµÑ€Ð°Ñ‚Ð¸Ð²Ð½Ð¾Ð¹ Ð³Ñ€ÑƒÐ¿Ð¿Ñ‹ Ð°Ð´Ð¼Ð¸Ð½Ð¸ÑÑ‚Ñ€Ð°Ñ†Ð¸Ð¸.','FALSE'),('Proverka-br','45435','','TRUE'),('Proverka1','test','','FALSE'),('Proverka2','ÐŸÑ€Ð¾Ð²ÐµÑ€ÐºÐ° ÑÐ¸ÑÑ‚ÐµÐ¼Ñ‹ Ð¾Ð¿Ð¾Ð²ÐµÑ‰ÐµÐ½Ð¸Ñ.','ÐŸÑ€Ð¾Ð¸Ð·Ð²Ð¾Ð´Ð¸Ñ‚ÑÑ Ñ‚ÐµÑ…Ð½Ð¸Ñ‡ÐµÑÐºÐ°Ñ Ð¿Ñ€Ð¾Ð²ÐµÑ€ÐºÐ° ÑÐ¸ÑÑ‚ÐµÐ¼Ñ‹ Ð¾Ð¿Ð¾Ð²ÐµÑ‰ÐµÐ½Ð¸Ñ.','FALSE');
-/*!40000 ALTER TABLE `alarm_codes` ENABLE KEYS */;
-UNLOCK TABLES;
-/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;

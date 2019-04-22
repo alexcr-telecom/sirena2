@@ -31,41 +31,36 @@
 <hr>
  <?php
  //Mysql
- $mysql = mysql_connect("localhost", "root", "vicidialnow") or die(mysql_error());
- mysql_select_db("asterisk") or die(mysql_error());
+ $mysql = mysql_connect("localhost", "root") or die(mysql_error());
+ mysql_select_db("sirena2") or die(mysql_error());
  
  //Обработка формы
  if ($_SERVER["REQUEST_METHOD"] == "POST" ) {
 
 //Остановка системы
 if (isset ($_POST['stop'])) {
-	mysql_query("update vicidial_list set status = 'SP' where status !='PU' and list_id ='1001'") or die(mysql_error());
+	
 	print '<div id="warning">АВАРИЙНАЯ ОСТАНОВКА</div>';
 }
 
 //Обзвон абонентов	 
 	if(isset($_POST['start']) && empty($_POST['stop']) ) {
-	mysql_query("update vicidial_list set status = 'NEW',called_since_last_reset = 'N',gmt_offset_now = '-5.00' where list_id ='1001'") or die(mysql_error());
+	exec('aplay /var/www/html/sounds/'.$_POST['alarm_code'].'.wav >/dev/null 2>/dev/null &');
 	}
-//Выбор кода оповещения		
-	if(isset($_POST['alarm_code']) && empty($_POST['stop'])) {	     
-		
-        mysql_query("update vicidial_campaigns set survey_first_audio_file = 'go_".$_POST['alarm_code']."' where campaign_id = '76873962'") or die(mysql_error());
-     
-   }
+
 
 }		
  //Статус системы
-	$sql_data2 = mysql_query("select status from vicidial_list where status = 'NEW' and list_id ='1001'") 	or die(mysql_error());
-	$status = mysql_fetch_array( $sql_data2 );
+	
+	$status = shell_exec("ps -A | grep aplay");
 	if(empty($status)) {
 	Print '<h2>Статус внутреннего оповещения: Отключено</h2>';
 	} else {
-		Print '<h2>Статус внутреннего оповещения: Работа</h2>';
+		Print '<br><h2>Статус оповещения: <div id="warning">Работа</div></h2>';
 	}
 //Запись в журнал	
 if(isset($_POST['alarm_code']) && empty($_POST['stop'])){
-	
+	date_default_timezone_set('Europe/Samara');
 	mysql_query('insert into alarm_journal values("'.date("Y-m-d 
 	H:i:s").'","'.$_SERVER['REMOTE_ADDR'].'","","","","'.$_POST['alarm_code'].'","HALL","'.$_SERVER['REMOTE_USER'].'")') or 
 	die(mysql_error());
@@ -125,7 +120,7 @@ $sql_data = mysql_query("select * from alarm_codes where broadcast = 'TRUE'") or
 			<img src="images/arrow.gif" alt="" /> <a href="http://www.utg.gazprom.ru/newUTG/default.aspx" target="_blank">Официальный сайт ООО "Газпром трансгаз Саратов"</a> <br />
 			<br>
 			
-			<img src="images/arrow.gif" alt="" /> <a href="http://10.16.167.14" target="_blank">Freepbx</a> <br />
+			
 			<img src="images/arrow.gif" alt="" /> <a href="/sirena/list.php" target="_blank">Протокол оповещения</a> <br />
 			<img src="images/arrow.gif" alt="" /> <a href="/sirena/alarm.php" target="_blank">Запуск оповещения</a> <br />
 			<img src="images/arrow.gif" alt="" /> <a href="/sirena/broadcast.php" target="_blank">Этажное оповещение</a> <br />
@@ -138,7 +133,7 @@ $sql_data = mysql_query("select * from alarm_codes where broadcast = 'TRUE'") or
 		</div>
 	</div>
 	<br />&nbsp;<br />
-	<div id="footer">Copyright &copy; 2016 US | Design: СЦС 
+	<div id="footer">Copyright &copy; 2018 US | Design: СЦС 
 		 
 </div>
 	

@@ -1,0 +1,5 @@
+  AuthName "restricted stuff"
+  AuthType Basic
+  AuthUserFile /etc/httpd/sirena
+
+  require valid-user

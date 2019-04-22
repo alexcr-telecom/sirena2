@@ -142,7 +142,7 @@ $MESSAGE=$_POST['alarm_code'];
 		
 //Запись в журнал
 if($unchoose_count < '3' && isset($_POST['alarm_code']) && isset($_POST['list_code']) && empty($_POST['stop'])){
-	
+	date_default_timezone_set('Europe/Samara');
 	mysql_query('insert into alarm_journal values("'.exec("date -Im").'","'.$_SERVER['REMOTE_ADDR'].'","'.$_POST['dial'].'","'.$_POST['mail'].'","'.$_POST['sms'].'","'.$_POST['alarm_code'].'","'.$_POST['list_code'].'","'.$_SERVER['REMOTE_USER'].'")') or 
 die(mysql_error());
 //Перенаправление на страницу запуска
@@ -299,7 +299,7 @@ print "<TD BGCOLOR=#FA0008><h2>Модем не подключен</h2></TD>";
 		</div>
 	</div>
 	<br />&nbsp;<br />
-	<div id="footer">Copyright &copy; 2016 US | Design: СЦС 
+	<div id="footer">Copyright &copy; 2018 US | Design: СЦС 
 		 
 </div>
 	

@@ -79,7 +79,7 @@ if ($uploadOk == 0 && empty($_POST['delete_code'])) {
  if(isset($_POST['delete_code'])) {
 	 
 	 foreach ($_POST['delete_code'] as $db_code){
-	  $file_path = $target_dir."go_".$db_code.".wav";
+	  $file_path = $target_dir.$db_code.".wav";
 
 	  if (file_exists($file_path)) {
          unlink($file_path);
@@ -151,7 +151,7 @@ mysql_close($mysql);
   <hr>
 
 <div class="boxads">Cистема оповещения.
- Версия 1.1 <br> <b>Источники информации: </b><br>&#9679; Шаблоны CSS -<a href="http://www.free-css-templates.com">David Herreman </a> 
+ Версия 2.0 <br> <b>Источники информации: </b><br>&#9679; Шаблоны CSS -<a href="http://www.free-css-templates.com">David Herreman </a> 
 <br><b>Среда разработки: </b><br>&#9679; Geany.<br> 
 2016г. ,СЦС. <a href="mailto:samohin-iv@utg.gazprom.ru">Самохин И.В.</a></div>
 			</div>
@@ -182,7 +182,7 @@ mysql_close($mysql);
 		</div>
 	</div>
 	<br />&nbsp;<br />
-	<div id="footer">Copyright &copy; 2016 US | Design: СЦС 
+	<div id="footer">Copyright &copy; 2018 US | Design: СЦС 
 		 
 </div>
 	

@@ -114,7 +114,11 @@ if (isset($_FILES["leadfile"]) && $_FILES["leadfile"]["type"] != "application/vn
 			unlink("/tmp/".$new_filename);
 			unlink("/tmp/".$_FILES["leadfile"]["name"]);
 			print ("<h2>Список ".$_FILES["leadfile"]["name"]." загружен</h2>");
-			print ("Дубликатов: ".$dups_number." Ошибок: ".$error." Всего: ".$total);
+			if ($error > 0){
+				print ("Дубликатов: ".$dups_number." Ошибок: <div id=warning>".$error."</div> Всего: ".$total);
+			} else {
+				print ("Дубликатов: ".$dups_number." Ошибок: ".$error." Всего: ".$total);
+			}
 }
 
 	 
@@ -179,7 +183,7 @@ $list = mysql_query("select list_id,list_name from dialout_lists where list_id !
 <hr>
 
 <div class="boxads">Cистема оповещения.
- Версия 1.1 <br> <b>Источники информации: </b><br>&#9679; Шаблоны CSS -<a href="http://www.free-css-templates.com">David Herreman </a> 
+ Версия 2.0 <br> <b>Источники информации: </b><br>&#9679; Шаблоны CSS -<a href="http://www.free-css-templates.com">David Herreman </a> 
 <br><b>Среда разработки: </b><br>&#9679; Geany.<br> 2016г. ,СЦС. <a href="mailto:samohin-iv@utg.gazprom.ru">Самохин И.В.</a></div>
 			</div>
 		<div class="leftmenu">
@@ -196,7 +200,7 @@ $list = mysql_query("select list_id,list_name from dialout_lists where list_id !
 			<img src="images/arrow.gif" alt="" /> <a href="http://www.utg.gazprom.ru/newUTG/default.aspx" target="_blank">Официальный сайт ООО "Газпром трансгаз Саратов"</a> <br />
 			<br>
 			
-			<img src="images/arrow.gif" alt="" /> <a href="http://10.16.167.14" target="_blank">Freepbx</a> <br />
+			
 			<img src="images/arrow.gif" alt="" /> <a href="/sirena/list.php" target="_blank">Протокол оповещения</a> <br />
 			<img src="images/arrow.gif" alt="" /> <a href="/sirena/alarm.php" target="_blank">Запуск оповещения</a> <br />
 			<img src="images/arrow.gif" alt="" /> <a href="/sirena/broadcast.php" target="_blank">Этажное оповещение</a> <br />
@@ -208,7 +212,7 @@ $list = mysql_query("select list_id,list_name from dialout_lists where list_id !
 		</div>
 	</div>
 	<br />&nbsp;<br />
-	<div id="footer">Copyright &copy; 2016 US | Design: СЦС 
+	<div id="footer">Copyright &copy; 2018 US | Design: СЦС 
 		 
 </div>
 	

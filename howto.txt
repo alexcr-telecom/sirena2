@@ -1,0 +1,45 @@
+scp ivan@10.16.167.140:sirena2/sirena2.zip ./
+
+unzip sirena2.zip
+mkdir /var/www/html/sirena/
+mv sirena2/* /var/www/html/sirena/
+cd /var/www/html/sirena/
+cp amd.conf /etc/asterisk/
+cp sendsms-remote.sh /usr/bin/
+cp start-dial.sh /usr/bin/
+cp sheet2tab.pl ../
+export http_proxy="http://10.16.101.11:8888"
+yum install cpan
+
+echo create database sirena2 | mysql
+mysql sirena2 < alarm_codes.sql
+mysql sirena2 < alarm_journal.sql
+mysql sirena2 < vicidial_list.sql
+echo "GRANT ALL PRIVILEGES ON *.* TO 'asterisk'@'localhost' IDENTIFIED BY '';" | mysql
+yes | cpan Spreadsheet::Read
+
+yes | cpan Spreadsheet::ParseXLSX
+
+ssh-keygen -f /var/opt/id_rsa
+
+chown asterisk:asterisk /var/opt/id_rsa
+cat /var/opt/id_rsa.pub
+ssh user@10.16.101.110
+
+rpm -i --nodeps ./rpm/*
+
+asterisk -rx "module load app_amd.so"
+
+mkdir /var/www/html/sounds/
+chown asterisk:asterisk /var/www/html/sounds/
+chmod +x ../sheet2tab.pl
+chmod +x  /usr/bin/sendsms-remote.sh
+chmod +x  /usr/bin/start-dial.sh
+ln -s /var/www/html/sirena/alarm.php /var/www/html/sirena/index.php
+cat ext_custom.conf >> /etc/asterisk/extensions_custom.conf
+/etc/init.d/asterisk reload
+
+htpasswd -c /etc/httpd/sirena Admin
+
+chown asterisk:asterisk /etc/httpd/sirena
+cp htaccess .htaccess
