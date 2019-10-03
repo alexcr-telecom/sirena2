@@ -107,6 +107,15 @@ $fp = fopen("php://temp/maxmemory:$size_fp", 'r+');
          case "Answered as  MACHINE The message heared":
             $status = "Автоответчик";
             break;
+         case "Answered as  NOTSURE The message heared":
+            $status = "Сообщение прослушано";
+            break; 
+         case "Answered as  NOTSURE The message unheared":
+            $status = "Сообщение недослушано";
+            break; 
+         case "Answered as  MACHINE The message unheared":
+            $status = "Автоответчик";
+            break;
          case "NEW":
             $status = "В очереди";
             break;

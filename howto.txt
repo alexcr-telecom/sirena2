@@ -38,8 +38,9 @@ chmod +x  /usr/bin/start-dial.sh
 ln -s /var/www/html/sirena/alarm.php /var/www/html/sirena/index.php
 cat ext_custom.conf >> /etc/asterisk/extensions_custom.conf
 /etc/init.d/asterisk reload
-
+gpasswd -a asterisk sound
 htpasswd -c /etc/httpd/sirena Admin
+/etc/init.d/httpd restart
 
 chown asterisk:asterisk /etc/httpd/sirena
 cp htaccess .htaccess

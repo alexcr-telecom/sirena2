@@ -92,8 +92,24 @@ $MESSAGE=$_POST['alarm_code'];
 		fwrite($HTMPFILE, "Priority: 1\n");
 		fwrite($HTMPFILE, "Set: ARRAY(data,ext)=/var/www/html/sounds/$MESSAGE,$num\n");
 	}
+	$alt_num=$data['alt_phone'];
+	if($alt_num != "")
+	{
+		
+		$HTMPFILE = fopen($TEMPDIR.'file'.$alt_num.'.call-alt',w);
+		fwrite($HTMPFILE, "Channel: Local/$alt_num@sirena-out/n\n");
+		fwrite($HTMPFILE, "CallerID: $CALLERID\n");
+		fwrite($HTMPFILE, "MaxRetries: $MAXRETRIES\n");
+		fwrite($HTMPFILE, "RetryTme: $RETRYTIME\n");
+		fwrite($HTMPFILE, "WaitTme: $WAITTIME\n");
+		fwrite($HTMPFILE, "Context: callback-rings\n");
+		fwrite($HTMPFILE, "Extension: autocall\n");
+		fwrite($HTMPFILE, "Priority: 1\n");
+		fwrite($HTMPFILE, "Set: ARRAY(data,ext)=/var/www/html/sounds/$MESSAGE,$alt_num\n");
+	}
 }
 	exec('/usr/bin/start-dial.sh >/dev/null 2>/dev/null &');
+	exec('/usr/bin/start-dial-alt.sh >/dev/null 2>/dev/null &');
 	}else { 
 	$unchoose_count++;
 		}
@@ -166,7 +182,7 @@ print '<script>window.location = "/sirena/alarm.php";</script>';
 <TD BGCOLOR="#7FFFF4"><h2>Телефонная линия:</h2></TD>
 
 <?php
-if(exec(' /usr/sbin/asterisk -x "iax2 show peers" | grep OK')){
+if(exec(' /usr/sbin/asterisk -x "sip show peers" | grep 10.16.167.180 | grep OK')){
 print "<TD BGCOLOR=#00FF07><h2>OK</h2></TD>";
 } else {
 print "<TD BGCOLOR=#FA0008><h2>Нет связи с АТС</h2></TD>";
